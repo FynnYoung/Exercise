@@ -46,16 +46,12 @@ public class EM {
 			double sum = 0;
 			for(int j=0; j<k; j++){
 				double probability = probOfGauss(means[j], a[i]);
-				//System.out.println(probability);
+				
 				sum += probability;
 				distribution[i][j] = probability;
-				//System.out.println("probability: "+probability);
-				//System.out.println("distribution: "+distribution[i][j]);
-				//System.out.println("sum: "+sum);
 			}
 			for(int j=0; j<k; j++){
 				distribution[i][j] /= sum;
-				//System.out.println("distribution: "+distribution[i][j]);
 			}
 		}
 	}
@@ -64,10 +60,8 @@ public class EM {
 			double sum1 = 0;
 			double sum2 = 0;
 			for(int j=0; j<a.length; j++){
-				//System.out.println(distribution[j][i]+" "+a[j]);
 				sum1 += distribution[j][i]*a[j];
 				sum2 += distribution[j][i];
-				//System.out.println("sum: "+sum1+" "+sum2);
 			}
 			means[i] = sum1/sum2;
 			System.out.print(means[i]+" ");
@@ -76,9 +70,6 @@ public class EM {
 	}
 	
 	protected double probOfGauss(double mean, double x){
-		double b = -1.0*Math.pow(x-mean, 2)/2.0/Math.pow(var, 2);
-		//System.out.println("b: "+b);
-		//System.out.println(Math.exp(b));
 		return Math.exp(-1.0*Math.pow(x-mean, 2)/2.0/Math.pow(var, 2));
 	}
 
