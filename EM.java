@@ -24,7 +24,7 @@ public class EM {
 			means[i] = random.nextDouble();
 		}
 	}
-	protected void multiGauss(){
+	protected void mixedGauss(){
 		Mark:
 			while(true){
 				double[] prior = means.clone();
@@ -77,7 +77,7 @@ public class EM {
 		// TODO Auto-generated method stub
 		EM e = new EM();
 		e.init();
-		e.multiGauss();
+		e.mixedGauss();
 
 	}
 
