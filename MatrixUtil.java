@@ -1,7 +1,7 @@
 //package machine;
 
 public class MatrixUtil {
-	public double determinant(double[][] matrix){ // ĞĞÁĞÊ½
+	public double determinant(double[][] matrix){ // è¡Œåˆ—å¼
 		int dim = matrix.length;
 		double det = 0;
 		if(dim==2){
@@ -37,7 +37,7 @@ public class MatrixUtil {
 		return sub;
 	}
 	
-	public double[][] minor(double[][] matrix){ // Óà×Ó¾ØÕó
+	public double[][] minor(double[][] matrix){ // ä½™å­çŸ©é˜µ
 		int dim = matrix.length;
 		double[][] minor = new double[dim][dim];
 		for(int i=0; i<dim; i++){
@@ -48,11 +48,11 @@ public class MatrixUtil {
 		return minor;
 	}
 	
-	public double[][] adjugate(double[][] matrix){ // °éËæ¾ØÕó
+	public double[][] adjugate(double[][] matrix){ // ä¼´éšçŸ©é˜µ
 		return transpose(minor(matrix));
 	}
 	
-	public double[][] transpose(double[][] matrix){ // ×ªÖÃ
+	public double[][] transpose(double[][] matrix){ // è½¬ç½®
 		int dim = matrix.length;
 		double[][] transpose = new double[dim][dim];
 		for(int i=0; i<dim; i++){
@@ -63,7 +63,7 @@ public class MatrixUtil {
 		return transpose;
 	}
 	
-	public double[][] inverse(double[][] matrix){ // Äæ¾ØÕó
+	public double[][] inverse(double[][] matrix){ // é€†çŸ©é˜µ
 		double det = determinant(matrix);
 		double[][] adj = adjugate(matrix);
 		int dim = matrix.length;
@@ -75,6 +75,21 @@ public class MatrixUtil {
 		}
 		
 		return inverse;
+	}
+	
+	public double[][] add(double[][] a, double[][] b){
+		if(a.length!=b.length || a[0].length!=b[0].length){
+			System.out.println("wrong dimensions!");
+			return null;
+		}
+		double[][] c = new double[a.length][a[0].length];
+		for(int i=0; i<c.length; i++){
+			for(int j=0; j<c[0].length; j++){
+				c[i][j] = a[i][j]+b[i][j];
+			}
+		}
+		
+		return c;
 	}
 	
 	public double[][] multiplication(double[][] a, double[][] b){
