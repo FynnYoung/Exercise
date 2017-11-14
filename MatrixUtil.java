@@ -91,7 +91,20 @@ public class MatrixUtil {
 		
 		return c;
 	}
-	
+	public double[][] minus(double[][] a, double[][] b){
+		if(a.length!=b.length || a[0].length!=b[0].length){
+			System.out.println("wrong dimensions!");
+			return null;
+		}
+		double[][] c = new double[a.length][a[0].length];
+		for(int i=0; i<c.length; i++){
+			for(int j=0; j<c[0].length; j++){
+				c[i][j] = a[i][j]-b[i][j];
+			}
+		}
+		
+		return c;
+	}
 	public double[][] multiplication(double[][] a, double[][] b){
 		if(a[0].length!=b.length){
 			System.out.println("wrong dimensions!");
