@@ -1,10 +1,12 @@
 //package machine;
 
 public class MatrixUtil {
-	public double determinant(double[][] matrix){ // è¡Œåˆ—å¼
+	public double determinant(double[][] matrix){ // ĞĞÁĞÊ½
 		int dim = matrix.length;
 		double det = 0;
-		if(dim==2){
+		if(dim==1){
+			return matrix[0][0];
+		}else if(dim==2){
 			det = matrix[0][0]*matrix[1][1]-matrix[0][1]*matrix[1][0];
 		}else{
 			for(int i=0; i<dim; i++){
@@ -37,7 +39,7 @@ public class MatrixUtil {
 		return sub;
 	}
 	
-	public double[][] minor(double[][] matrix){ // ä½™å­çŸ©é˜µ
+	public double[][] minor(double[][] matrix){ // Óà×Ó¾ØÕó
 		int dim = matrix.length;
 		double[][] minor = new double[dim][dim];
 		for(int i=0; i<dim; i++){
@@ -48,24 +50,27 @@ public class MatrixUtil {
 		return minor;
 	}
 	
-	public double[][] adjugate(double[][] matrix){ // ä¼´éšçŸ©é˜µ
+	public double[][] adjugate(double[][] matrix){ // °éËæ¾ØÕó
 		return transpose(minor(matrix));
 	}
 	
-	public double[][] transpose(double[][] matrix){ // è½¬ç½®
-		int dim = matrix.length;
-		double[][] transpose = new double[dim][dim];
-		for(int i=0; i<dim; i++){
-			for(int j=0; j<dim; j++){
+	public double[][] transpose(double[][] matrix){ // ×ªÖÃ
+		int dimX = matrix.length;
+		int dimY = matrix[0].length;
+		double[][] transpose = new double[dimY][dimX];
+		for(int i=0; i<dimY; i++){
+			for(int j=0; j<dimX; j++){
 				transpose[i][j] = matrix[j][i];
 			}
 		}
 		return transpose;
 	}
 	
-	public double[][] inverse(double[][] matrix){ // é€†çŸ©é˜µ
+	public double[][] inverse(double[][] matrix){ // Äæ¾ØÕó
 		double det = determinant(matrix);
+		//System.out.println(det);
 		double[][] adj = adjugate(matrix);
+		//print(adj);
 		int dim = matrix.length;
 		double[][] inverse = new double[dim][dim];
 		for(int i=0; i<dim; i++){
@@ -122,24 +127,28 @@ public class MatrixUtil {
 		}
 		return result;
 	}
+	
+	public static void print(double[][] a){
+		for(double[] i : a){
+			for(double j : i) System.out.print(j+"\t");
+			System.out.println();
+		}
+	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//double[][] a = {{2,1,-1},{4,-1,1},{201,102,-99}}; // -18
 		//double[][] a = {{1,1,-1,3},{-1,-1,2,1},{2,5,2,4},{1,2,3,2}}; // 33
 		//double[][] a = {{1,0,-1,2},{-2,1,3,1},{0,1,0,-1},{1,3,4,-2}}; // 31
+		//double[][] matrix = {{2.5,-1.5},{-1.5,1}};
 		//double[][] matrix = {{4,3,0,0},{1,4,3,0},{0,1,4,3},{0,0,1,4}};
+		double[][] matrix = {{1,2,-1},{3,1,0},{-1,-1,-2}};
 		MatrixUtil m = new MatrixUtil();
-		double[][] a = {{1,2},{3,4}};
-		double[][] b = {{2},{1}};
-		double[][] r = m.multiplication(a, b);
-		//double[][] inverse = m.inverse(matrix);
-		for(int i=0; i<r.length; i++){
-			for(double j : r[i]){
-				System.out.print(j+"\t");
-			}
-			System.out.println();
-		}
+		//double[][] a = {{1,2},{3,4}};
+		//double[][] b = {{2},{1}};
+		//double[][] r = m.multiplication(a, b);
+		double[][] inverse = m.inverse(matrix);
+		m.print(inverse);
 		//System.out.println(m.determinant(a));
 		//double[][] sub = m.subMatrix(a, 2, 1);
 		//for(int i=0; i<sub.length; i++){
