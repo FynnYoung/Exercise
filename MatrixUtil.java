@@ -82,6 +82,115 @@ public class MatrixUtil {
 		return inverse;
 	}
 	
+	public double[][] upperHessenberg(double[][] matrix){ // Householder transform
+		if(matrix.length!=matrix[0].length){
+			System.out.println("wrong dimensions!");
+			return null;
+		}
+		
+		int dim = matrix.length;
+		double[][] I = identity(dim);
+		
+		double[][] result = matrix.clone();
+		for(int i=0; i<dim-2; i++){
+			double[] x = new double[dim];
+			double[] w = new double[dim];
+			double[][] v = new double[dim][1];
+			for(int j=0; j<=i; j++) x[j] = 0;
+			for(int j=i+1; j<dim; j++) x[j] = result[j][i];
+			double xNorm = 0;
+			for(double j : x) xNorm += Math.pow(j, 2);
+			xNorm = Math.sqrt(xNorm);
+			w[i+1] = xNorm;
+			double sign = x[0]>0?-1:1;
+			for(int j=0; j<dim; j++) v[j][0] = w[j]+sign*x[j];
+			
+			double[][] h = new double[dim][dim];
+			double[][] p = new double[dim][dim];
+			p = multiplication(multiplication(v, transpose(v)), 1.0/multiplication(transpose(v), v)[0][0]);
+			h = minus(I, multiplication(p, 2.0));
+			result = multiplication(multiplication(h, result), h);
+			for(int j=i+2; j<dim; j++) result[j][i] = 0;
+		}
+		return result;
+	}
+	
+	public double[][] QRDecomposition(double[][] matrix, int iterations){ // Givens transform on upper Hessenberg matrix
+		if(matrix.length!=matrix[0].length){
+			System.out.println("wrong dimensions!");
+			return null;
+		}
+		
+		int dim = matrix.length;
+		double[][] result = matrix.clone();
+		
+		for(int it=0; it<iterations; it++){
+			double[][] H = identity(dim);
+			for(int i=0; i<dim-1; i++){
+				if(result[i+1][i]!=0){
+					double r = Math.sqrt(Math.pow(result[i][i], 2)+Math.pow(result[i+1][i], 2));
+					double[][] I = identity(dim);
+					I[i][i] = result[i][i]/r;
+					I[i][i+1] = result[i+1][i]/r;
+					I[i+1][i] = -I[i][i+1];
+					I[i+1][i+1] = I[i][i];
+					result = multiplication(I, result);
+					H = multiplication(H, transpose(I));
+				}
+			}
+			result = multiplication(result, H);
+		}
+		return result;
+	}
+	
+	public double[] eigenvalues(double[][] matrix){ // all eigenvalues
+		double[] values = new double[matrix.length];
+		double[][] h = upperHessenberg(matrix);
+		double[][] q = QRDecomposition(h, 1000);
+		for(int i=0; i<values.length; i++) values[i] = q[i][i];
+		return values;
+	}
+	
+	public double exponentiation(double[][] matrix){ // the eigenvalue with the largest abs value and the corresponding eigenvector
+		int dim = matrix.length;
+		double[][] u = new double[dim][1];
+		u[0][0] = 1;
+		double betaPre = 0;
+		double[] mp = maxAbs(u);
+		double[][] y = new double[dim][1];
+		for(int i=0; i<dim; i++) y[i][0] = u[i][0]/mp[1];
+		u = multiplication(matrix, y);
+		double[] mn = maxAbs(u);
+		double betaNext = mp[0]*mn[0]*mn[1];
+		while(Math.abs((betaNext-betaPre)/betaNext)>0.000000000001){
+			betaPre = betaNext;
+			for(int i=0; i<dim; i++){
+				y[i][0] = u[i][0]/mn[1];
+				System.out.print(y[i][0]+"\t");
+			}
+			System.out.println();
+			u = multiplication(matrix, y);
+			mp = mn.clone();
+			mn = maxAbs(u);
+			//System.out.println(betaNext);
+			betaNext = mp[0]*mn[0]*mn[1];
+		}
+		
+		return betaNext;
+	}
+	private double[] maxAbs(double[][] u){
+		double[] result = new double[2];
+		result[0] = u[0][0]<0?-1:1;
+		result[1] = Math.abs(u[0][0]);
+		for(int i=1; i<u.length; i++){
+			if(Math.abs(u[i][0])>result[1]){
+				result[1] = Math.abs(u[i][0]);
+				result[0] = u[i][0]<0?-1:1;
+			}
+		}
+		return result;
+	}
+	
 	public double[][] add(double[][] a, double[][] b){
 		if(a.length!=b.length || a[0].length!=b[0].length){
 			System.out.println("wrong dimensions!");
@@ -127,6 +236,21 @@ public class MatrixUtil {
 		}
 		return result;
 	}
+	public double[][] multiplication(double[][] a, double b){
+		double[][] result = new double[a.length][a[0].length];
+		for(int i=0; i<result.length; i++){
+			for(int j=0; j<result[0].length; j++){
+				result[i][j] = a[i][j]*b;
+			}
+		}
+		return result;
+	}
+	
+	public double[][] identity(int dim){
+		double[][] I = new double[dim][dim];
+		for(int i=0; i<dim; i++) I[i][i] = 1;
+		return I;
+	}
 	
 	public static void print(double[][] a){
 		for(double[] i : a){
@@ -142,13 +266,19 @@ public class MatrixUtil {
 		//double[][] a = {{1,0,-1,2},{-2,1,3,1},{0,1,0,-1},{1,3,4,-2}}; // 31
 		//double[][] matrix = {{2.5,-1.5},{-1.5,1}};
 		//double[][] matrix = {{4,3,0,0},{1,4,3,0},{0,1,4,3},{0,0,1,4}};
-		double[][] matrix = {{1,2,-1},{3,1,0},{-1,-1,-2}};
+		double[][] matrix = {{5,-3,2},{6,-4,4},{4,-4,5}};
 		MatrixUtil m = new MatrixUtil();
-		//double[][] a = {{1,2},{3,4}};
+		//double[][] a = {{1,2}};
 		//double[][] b = {{2},{1}};
 		//double[][] r = m.multiplication(a, b);
-		double[][] inverse = m.inverse(matrix);
-		m.print(inverse);
+		//System.out.println(r[0][0]);
+		//m.print(r);
+		//double[][] I = m.identity(3);
+		//double[] values = m.eigenvalues(matrix);
+		//for(double i : values) System.out.println(i);
+		System.out.println(m.exponentiation(matrix));
+		//double[][] inverse = m.inverse(matrix);
+		//m.print(inverse);
 		//System.out.println(m.determinant(a));
 		//double[][] sub = m.subMatrix(a, 2, 1);
 		//for(int i=0; i<sub.length; i++){
