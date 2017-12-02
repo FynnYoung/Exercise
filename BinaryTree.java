@@ -3,11 +3,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 class TreeNode{
 	protected int value;
 	protected TreeNode leftChild;
 	protected TreeNode rightChild;
+	protected int maxLeftDepth = -1;
+	protected int maxRightDepth = -1;
+	protected int maxDistance = -1;
 	
 	public TreeNode(){
 		
@@ -105,6 +109,108 @@ public class BinaryTree {
 		}
 	}
 	
+	protected static boolean isBalanced = true;
+	public void isBalancedTree(TreeNode root){
+		isBalancedNode(root);
+		System.out.println(isBalanced);
+	}
+	public int isBalancedNode(TreeNode node){
+		if(node==null){
+			return 0;
+		}
+		int leftDepth = 0, rightDepth = 0;
+		if(isBalanced) leftDepth = isBalancedNode(node.leftChild);
+		if(isBalanced) rightDepth = isBalancedNode(node.rightChild);
+		if(isBalanced){
+			int diff = leftDepth-rightDepth;
+			if(diff<=1 && diff>=-1){
+				return 1+(leftDepth>rightDepth?leftDepth:rightDepth);
+			}else{
+				isBalanced = false;
+			}
+		}
+		return 0;
+	}
+	
+	public int maxDistanceOfNodesRecursive(TreeNode node){
+		int leftMax = 0;
+		int rightMax = 0;
+		if(node.leftChild==null){
+			node.maxLeftDepth = 0;
+		}else{
+			maxDistanceOfNodesRecursive(node.leftChild);
+			node.maxLeftDepth = Math.max(node.leftChild.maxLeftDepth, node.leftChild.maxRightDepth)+1;
+			leftMax = node.leftChild.maxLeftDepth+node.leftChild.maxRightDepth;
+		}
+		if(node.rightChild==null){
+			node.maxRightDepth = 0;
+		}else{
+			maxDistanceOfNodesRecursive(node.rightChild);
+			node.maxRightDepth = Math.max(node.rightChild.maxLeftDepth, node.rightChild.maxRightDepth)+1;
+			rightMax = node.rightChild.maxLeftDepth+node.rightChild.maxRightDepth;
+		}
+		System.out.println(node.value+" "+node.maxLeftDepth+" "+node.maxRightDepth);
+		return Math.max(Math.max(leftMax, rightMax), node.maxLeftDepth+node.maxRightDepth);
+	}
+	public int maxDistanceOfNodesIteration(TreeNode root){
+		if(root==null)
+			return -1;
+		
+		Stack<TreeNode> s = new Stack<TreeNode>();
+		TreeNode node = root;
+		while(node!=null || !s.isEmpty()){
+			while(node!=null && node.maxLeftDepth<0){
+				s.push(node);
+				node = node.leftChild;
+			}
+			//System.out.println(s);
+			if(!s.isEmpty()){
+				node = s.pop();
+				if(node.maxLeftDepth<0){
+					if(node.leftChild==null){
+						node.maxLeftDepth = 0;
+					}else{
+						node.maxLeftDepth = Math.max(node.leftChild.maxLeftDepth, node.leftChild.maxRightDepth)+1;
+						
+					}
+				}
+				if(node.maxRightDepth<0){
+					if(node.rightChild==null){
+						node.maxRightDepth = 0;
+						if(node.leftChild==null){
+							node.maxDistance = 0;
+						}else{
+							node.maxDistance = Math.max(node.leftChild.maxDistance, node.maxLeftDepth);
+						}
+						System.out.println(1+" "+node.value+" "+node.maxLeftDepth+" "+node.maxRightDepth);
+						if(!s.isEmpty())
+							node = s.peek().rightChild;
+						else
+							break;
+					}else if(node.rightChild.maxLeftDepth>=0 && node.rightChild.maxRightDepth>=0){
+						node.maxRightDepth = Math.max(node.rightChild.maxLeftDepth, node.rightChild.maxRightDepth)+1;
+						if(node.leftChild==null){
+							node.maxDistance = Math.max(node.rightChild.maxDistance, node.maxRightDepth);
+						}else{
+							node.maxDistance = Math.max(node.leftChild.maxDistance, 
+									Math.max(node.rightChild.maxDistance, node.maxLeftDepth+node.maxRightDepth));
+						}
+						System.out.println(2+" "+node.value+" "+node.maxLeftDepth+" "+node.maxRightDepth);
+						if(!s.isEmpty())
+							node = s.peek().rightChild;
+						else
+							break;
+					}else{
+						s.push(node);
+						node = node.rightChild;
+					}
+				}
+			}
+		}
+		
+		return root.maxDistance;
+	}
+	
 	public static void print(TreeNode node){
 		Queue<TreeNode> q = new LinkedList<TreeNode>();
 		List<TreeNode> list = new ArrayList<TreeNode>();
@@ -135,25 +241,32 @@ public class BinaryTree {
 		//int[] in = {4,7,2,1,5,3,8,6};
 		//TreeNode root = bt.orderPreIn(pre, in);
 		//print(root);
-		TreeNode n1 = new TreeNode(8);
-		TreeNode n2 = new TreeNode(8);
-		TreeNode n3 = new TreeNode(7);
-		TreeNode n4 = new TreeNode(9);
-		TreeNode n5 = new TreeNode(2);
-		TreeNode n6 = new TreeNode(4);
+		
+		TreeNode n1 = new TreeNode(1);
+		TreeNode n2 = new TreeNode(2);
+		TreeNode n3 = new TreeNode(3);
+		TreeNode n4 = new TreeNode(4);
+		TreeNode n5 = new TreeNode(5);
+		TreeNode n6 = new TreeNode(6);
 		TreeNode n7 = new TreeNode(7);
-		n1.leftChild = n2;
-		n1.rightChild = n3;
-		n2.leftChild = n4;
-		n2.rightChild = n5;
-		n5.leftChild = n6;
-		n5.rightChild = n7;
 		TreeNode n8 = new TreeNode(8);
-		TreeNode n9 = new TreeNode(6);
-		TreeNode n10 = new TreeNode(2);
-		n8.leftChild = n9;
-		n8.rightChild = n10;
-		System.out.println(bt.hasSubtree(n1, n8));
+		TreeNode n9 = new TreeNode(9);
+		TreeNode n10 = new TreeNode(10);
+		n1.leftChild = n2;
+		n2.leftChild = n3;
+		n3.leftChild = n4;
+		n4.leftChild = n5;
+		n5.leftChild = n6;
+		n6.rightChild = n7;
+		n7.rightChild = n8;
+		n8.rightChild = n9;
+		n9.rightChild = n10;
+		//System.out.println(bt.hasSubtree(n1, n8));
+		//bt.isBalancedTree(n1);
+		//TreeNode t = new TreeNode();
+		//System.out.println(t.value);
+		//System.out.println(t.leftChild);
+		System.out.println(bt.maxDistanceOfNodesIteration(n1));
 
 	}
 
